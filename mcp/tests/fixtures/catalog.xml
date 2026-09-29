@@ -1,0 +1,723 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"
+      xmlns:dc="http://purl.org/dc/terms/"
+      xmlns:opds="https://specs.opds.io/opds-1.2"
+      xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">
+  <id>d30406dc-81e9-4c2a-5f02-95d25051a3c2</id>
+
+  <link rel="self"
+        href="/catalog/v2/entries?count=-1"
+        type="application/atom+xml;profile=opds-catalog;kind=acquisition"/>
+  <link rel="start"
+        href="/catalog/v2/root.xml"
+        type="application/atom+xml;profile=opds-catalog;kind=navigation"/>
+  <link rel="up"
+        href="/catalog/v2/root.xml"
+        type="application/atom+xml;profile=opds-catalog;kind=navigation"/>
+
+  <title>Filtered Entries (count=-1)</title>
+  <updated>2026-09-29T14:20:19Z</updated>
+  <totalResults>28</totalResults>
+  <startIndex>0</startIndex>
+  <itemsPerPage>28</itemsPerPage>
+  <entry>
+    <id>urn:uuid:0fea6bdc-6861-4830-5227-e7de417f9822</id>
+    <title>Motor Vehicle Mechanics</title>
+    <updated>2026-08-04T00:00:00Z</updated>
+    <summary>Stack Exchange Q&amp;A for mechanics and owners of cars, trucks, and motorcycles</summary>
+    <language>eng</language>
+    <name>mechanics.stackexchange.com_en_all</name>
+    <flavour></flavour>
+    <category>stack_exchange</category>
+    <tags>_videos:no;_category:stack_exchange;stack_exchange;_details:no;_ftindex:yes;_pictures:yes</tags>
+    <articleCount>54909</articleCount>
+    <mediaCount>12492</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/0fea6bdc-6861-4830-5227-e7de417f9822/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/mechanics.stackexchange.com_en_all_2026-08" />
+    <author>
+      <name>Stack Exchange</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-08-04T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:1490860c-e63e-73a9-1851-ab78a712c00a</id>
+    <title>Food for Preppers</title>
+    <updated>2025-04-11T00:00:00Z</updated>
+    <summary>A collection of recipes and techniques for preparing food.</summary>
+    <language>eng</language>
+    <name>zimgit-food-preparation_en</name>
+    <flavour></flavour>
+    <category></category>
+    <tags>preppers;_ftindex:no;_pictures:yes;_videos:yes;_details:yes</tags>
+    <articleCount>1</articleCount>
+    <mediaCount>369</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/1490860c-e63e-73a9-1851-ab78a712c00a/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/zimgit-food-preparation_en_2025-04" />
+    <author>
+      <name>Various</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2025-04-11T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:1e2f2cb1-4301-93d4-4776-b59649de340f</id>
+    <title>NHS&apos; Medicines A to Z</title>
+    <updated>2026-09-18T00:00:00Z</updated>
+    <summary>How medicines work, how and when to take them</summary>
+    <language>eng</language>
+    <name>nhs.uk_en_medicines</name>
+    <flavour></flavour>
+    <category>other</category>
+    <tags>_category:other;_ftindex:yes;medical;_pictures:yes;_videos:yes;_details:yes</tags>
+    <articleCount>1347</articleCount>
+    <mediaCount>32</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/1e2f2cb1-4301-93d4-4776-b59649de340f/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/nhs.uk_en_medicines_2026-09b" />
+    <author>
+      <name>-</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-09-18T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:2e17beb8-4d08-4734-75d4-6f56f73f3610</id>
+    <title>Water Treatment Library</title>
+    <updated>2024-08-29T00:00:00Z</updated>
+    <summary>Resources about water collection and purification</summary>
+    <language>eng</language>
+    <name>zimgit-water_en</name>
+    <flavour></flavour>
+    <category></category>
+    <tags>preppers;_ftindex:no;_pictures:yes;_videos:yes;_details:yes</tags>
+    <articleCount>1</articleCount>
+    <mediaCount>369</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/2e17beb8-4d08-4734-75d4-6f56f73f3610/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/zimgit-water_en_2024-08" />
+    <author>
+      <name>Various</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2024-08-29T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:2e8aee9a-7ef2-4069-97af-83d4ccef0fc1</id>
+    <title>Home Improvement Q&amp;A</title>
+    <updated>2026-08-03T00:00:00Z</updated>
+    <summary>Stack Exchange Q&amp;A for contractors and serious DIYers</summary>
+    <language>eng</language>
+    <name>diy.stackexchange.com_en_all</name>
+    <flavour></flavour>
+    <category>stack_exchange</category>
+    <tags>_videos:no;_details:no;stack_exchange;_category:stack_exchange;_ftindex:yes;_pictures:yes</tags>
+    <articleCount>165653</articleCount>
+    <mediaCount>97970</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/2e8aee9a-7ef2-4069-97af-83d4ccef0fc1/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/diy.stackexchange.com_en_all_2026-08" />
+    <author>
+      <name>Stack Exchange</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-08-03T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:379d50f8-aa89-85d5-d627-71ce7760aea7</id>
+    <title>Homebrewing Q&amp;A</title>
+    <updated>2026-08-02T00:00:00Z</updated>
+    <summary>Stack Exchange Q&amp;A for dedicated home brewers (beer, wine…) and enthusiasts</summary>
+    <language>eng</language>
+    <name>homebrew.stackexchange.com_en_all</name>
+    <flavour></flavour>
+    <category>stack_exchange</category>
+    <tags>stack_exchange;_category:stack_exchange;_videos:no;_details:no;_ftindex:yes;_pictures:yes</tags>
+    <articleCount>10999</articleCount>
+    <mediaCount>775</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/379d50f8-aa89-85d5-d627-71ce7760aea7/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/homebrew.stackexchange.com_en_all_2026-08" />
+    <author>
+      <name>Stack Exchange</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-08-02T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:3af31496-dba2-1022-3b55-e39469019c35</id>
+    <title>Wikibooks</title>
+    <updated>2026-04-27T00:00:00Z</updated>
+    <summary>The open-content textbooks collection</summary>
+    <language>eng</language>
+    <name>wikibooks_en_all</name>
+    <flavour>maxi</flavour>
+    <category>wikibooks</category>
+    <tags>wikibooks;_category:wikibooks;_pictures:yes;_videos:no;_details:yes;_ftindex:yes</tags>
+    <articleCount>118571</articleCount>
+    <mediaCount>266325</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/3af31496-dba2-1022-3b55-e39469019c35/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/wikibooks_en_all_maxi_2026-04" />
+    <author>
+      <name>Wikibooks</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-04-27T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:4b0384a5-3ab0-251c-ff9c-ad1223d84a61</id>
+    <title>WikiCiv</title>
+    <updated>2025-11-07T00:00:00Z</updated>
+    <summary>The wiki manual for building civilization from scratch</summary>
+    <language>eng</language>
+    <name>wikiciv_en_all</name>
+    <flavour>maxi</flavour>
+    <category></category>
+    <tags>preppers;wikiciv;_pictures:yes;_videos:no;_details:yes;_ftindex:yes</tags>
+    <articleCount>441</articleCount>
+    <mediaCount>317</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/4b0384a5-3ab0-251c-ff9c-ad1223d84a61/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/wikiciv_en_all_maxi_2025-11" />
+    <author>
+      <name>Wikiciv</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2025-11-07T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:503eb1c7-32d8-b6ef-a19c-8c4b6e06ff2a</id>
+    <title>The Great Outdoors Q&amp;A</title>
+    <updated>2026-08-04T00:00:00Z</updated>
+    <summary>Stack Exchange Q&amp;A for everything being outdoors enjoying nature and wilderness</summary>
+    <language>eng</language>
+    <name>outdoors.stackexchange.com_en_all</name>
+    <flavour></flavour>
+    <category>stack_exchange</category>
+    <tags>_details:no;_category:stack_exchange;_videos:no;stack_exchange;_ftindex:yes;_pictures:yes</tags>
+    <articleCount>12969</articleCount>
+    <mediaCount>4994</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/503eb1c7-32d8-b6ef-a19c-8c4b6e06ff2a/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/outdoors.stackexchange.com_en_all_2026-08" />
+    <author>
+      <name>Stack Exchange</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-08-04T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:5220673d-1ea1-58a5-ff21-3220696e7601</id>
+    <title>Woodworking Q&amp;A</title>
+    <updated>2026-08-06T00:00:00Z</updated>
+    <summary>Stack Exchange Q&amp;A for professional and amateur woodworkers</summary>
+    <language>eng</language>
+    <name>woodworking.stackexchange.com_en_all</name>
+    <flavour></flavour>
+    <category>stack_exchange</category>
+    <tags>stack_exchange;_videos:no;_details:no;_category:stack_exchange;_ftindex:yes;_pictures:yes</tags>
+    <articleCount>8501</articleCount>
+    <mediaCount>5379</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/5220673d-1ea1-58a5-ff21-3220696e7601/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/woodworking.stackexchange.com_en_all_2026-08" />
+    <author>
+      <name>Stack Exchange</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-08-06T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:5b779c6a-b5c1-45d7-dc20-539ca24c7878</id>
+    <title>Bicycles Q&amp;A</title>
+    <updated>2026-08-01T00:00:00Z</updated>
+    <summary>Stack Exchange Q&amp;A for people involved with bicycles</summary>
+    <language>eng</language>
+    <name>bicycles.stackexchange.com_en_all</name>
+    <flavour></flavour>
+    <category>stack_exchange</category>
+    <tags>stack_exchange;_videos:no;_category:stack_exchange;_details:no;_ftindex:yes;_pictures:yes</tags>
+    <articleCount>42650</articleCount>
+    <mediaCount>20289</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/5b779c6a-b5c1-45d7-dc20-539ca24c7878/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/bicycles.stackexchange.com_en_all_2026-08" />
+    <author>
+      <name>Stack Exchange</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-08-01T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:61960124-489a-f6e3-daf2-575e0add49ff</id>
+    <title>CD3WD Project</title>
+    <updated>2025-11-12T00:00:00Z</updated>
+    <summary>Over 900 technical documents covering topics related to sustainable development.</summary>
+    <language>eng</language>
+    <name>cd3wdproject.org_en_all</name>
+    <flavour></flavour>
+    <category>other</category>
+    <tags>_ftindex:yes;_category:other;preppers;_pictures:yes;_videos:yes;_details:yes</tags>
+    <articleCount>13297</articleCount>
+    <mediaCount>50687</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/61960124-489a-f6e3-daf2-575e0add49ff/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/cd3wdproject.org_en_all_2025-11" />
+    <author>
+      <name>-</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2025-11-12T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:6abd08fe-5aac-a7a1-e478-a26c8d9d3655</id>
+    <title>Pets Q&amp;A</title>
+    <updated>2026-08-04T00:00:00Z</updated>
+    <summary>Stack Exchange Q&amp;A for pet owners, caretakers, breeders, veterinarians, trainers</summary>
+    <language>eng</language>
+    <name>pets.stackexchange.com_en_all</name>
+    <flavour></flavour>
+    <category>stack_exchange</category>
+    <tags>_details:no;_category:stack_exchange;_videos:no;stack_exchange;_ftindex:yes;_pictures:yes</tags>
+    <articleCount>17055</articleCount>
+    <mediaCount>2511</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/6abd08fe-5aac-a7a1-e478-a26c8d9d3655/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/pets.stackexchange.com_en_all_2026-08" />
+    <author>
+      <name>Stack Exchange</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-08-04T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:71b38aa8-a034-4525-b24f-77ada19c76a6</id>
+    <title>Military Medicine</title>
+    <updated>2026-05-04T00:00:00Z</updated>
+    <summary>Doctrinal and Instructional manuals</summary>
+    <language>eng</language>
+    <name>irp.fas.org_en_military-medicine</name>
+    <flavour></flavour>
+    <category>other</category>
+    <tags>_ftindex:yes;preppers;medicine;_category:other;_pictures:yes;_videos:yes;_details:yes</tags>
+    <articleCount>26</articleCount>
+    <mediaCount>2</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/71b38aa8-a034-4525-b24f-77ada19c76a6/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/irp.fas.org_en_military-medicine_2026-05" />
+    <author>
+      <name>-</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-05-04T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:75c85518-998b-ffae-7f9b-ee36b66bf989</id>
+    <title>USDA Guide to Home Canning</title>
+    <updated>2025-04-11T00:00:00Z</updated>
+    <summary>Research-based recommendations for canning safer and better quality food at home</summary>
+    <language>eng</language>
+    <name>usda-2015_en</name>
+    <flavour></flavour>
+    <category></category>
+    <tags>preppers;_ftindex:no;_pictures:yes;_videos:yes;_details:yes</tags>
+    <articleCount>1</articleCount>
+    <mediaCount>369</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/75c85518-998b-ffae-7f9b-ee36b66bf989/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/usda-2015_en_2025-04" />
+    <author>
+      <name>Various</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2025-04-11T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:7d3391aa-c375-a479-c5de-7d2916058123</id>
+    <title>Amateur Radio Q&amp;A</title>
+    <updated>2026-08-02T00:00:00Z</updated>
+    <summary>Stack Exchange Q&amp;A for amateur radio enthusiasts</summary>
+    <language>eng</language>
+    <name>ham.stackexchange.com_en_all</name>
+    <flavour></flavour>
+    <category>stack_exchange</category>
+    <tags>_category:stack_exchange;stack_exchange;_videos:no;_details:no;_ftindex:yes;_pictures:yes</tags>
+    <articleCount>9238</articleCount>
+    <mediaCount>3610</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/7d3391aa-c375-a479-c5de-7d2916058123/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/ham.stackexchange.com_en_all_2026-08" />
+    <author>
+      <name>Stack Exchange</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-08-02T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:80d8dddf-1ecc-e528-0f08-3193044c6413</id>
+    <title>Medical Library</title>
+    <updated>2024-08-29T00:00:00Z</updated>
+    <summary>A collection of books pertaining to field and emergency medicine.</summary>
+    <language>eng</language>
+    <name>zimgit-medicine_en</name>
+    <flavour></flavour>
+    <category></category>
+    <tags>preppers;medical;_ftindex:no;_pictures:yes;_videos:yes;_details:yes</tags>
+    <articleCount>1</articleCount>
+    <mediaCount>369</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/80d8dddf-1ecc-e528-0f08-3193044c6413/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/zimgit-medicine_en_2024-08" />
+    <author>
+      <name>Various</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2024-08-29T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:858ed097-7a8b-c59d-32f4-655e8bf4ff4b</id>
+    <title>Restarters</title>
+    <updated>2026-04-25T00:00:00Z</updated>
+    <summary>How things work and how to fix them</summary>
+    <language>eng</language>
+    <name>restarters_en_all</name>
+    <flavour>maxi</flavour>
+    <category></category>
+    <tags>preppers;restarters;_pictures:yes;_videos:no;_details:yes;_ftindex:yes</tags>
+    <articleCount>1003</articleCount>
+    <mediaCount>451</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/858ed097-7a8b-c59d-32f4-655e8bf4ff4b/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/restarters_en_all_maxi_2026-04" />
+    <author>
+      <name>Restarters</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-04-25T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:880079d1-bc6a-772d-d185-3baf1d11d132</id>
+    <title>Engineering Q&amp;A</title>
+    <updated>2026-08-01T00:00:00Z</updated>
+    <summary>Stack Exchange Q&amp;A for professionals and students of engineering</summary>
+    <language>eng</language>
+    <name>engineering.stackexchange.com_en_all</name>
+    <flavour></flavour>
+    <category>stack_exchange</category>
+    <tags>_videos:no;_category:stack_exchange;stack_exchange;_details:no;_ftindex:yes;_pictures:yes</tags>
+    <articleCount>31251</articleCount>
+    <mediaCount>16932</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/880079d1-bc6a-772d-d185-3baf1d11d132/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/engineering.stackexchange.com_en_all_2026-08" />
+    <author>
+      <name>Stack Exchange</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-08-01T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:8ae52fd6-2def-000e-52fd-a5b72a0848f1</id>
+    <title>Sustainable Living Q&amp;A</title>
+    <updated>2026-08-06T00:00:00Z</updated>
+    <summary>Stack Exchange Q&amp;A for folks dedicated to not depleting available resources</summary>
+    <language>eng</language>
+    <name>sustainability.stackexchange.com_en_all</name>
+    <flavour></flavour>
+    <category>stack_exchange</category>
+    <tags>stack_exchange;_details:no;_category:stack_exchange;_videos:no;_ftindex:yes;_pictures:yes</tags>
+    <articleCount>4647</articleCount>
+    <mediaCount>939</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/8ae52fd6-2def-000e-52fd-a5b72a0848f1/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/sustainability.stackexchange.com_en_all_2026-08" />
+    <author>
+      <name>Stack Exchange</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-08-06T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:8bb17ab3-cedc-4645-b8ab-d441e45c4afe</id>
+    <title>United Kingdom</title>
+    <updated>2026-06-12T00:00:00Z</updated>
+    <summary>Full map, including roads and landmarks</summary>
+    <language>eng</language>
+    <name>maps_en_united-kingdom</name>
+    <flavour></flavour>
+    <category></category>
+    <tags>_sw:no;_ftindex:no;_pictures:yes;_videos:no;_details:yes</tags>
+    <articleCount>14830</articleCount>
+    <mediaCount>3403</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/8bb17ab3-cedc-4645-b8ab-d441e45c4afe/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/maps_en_united-kingdom_2026-06" />
+    <author>
+      <name>openZIM</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-06-12T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:bc152b4c-e7f5-0cfb-aaf0-817ab430f243</id>
+    <title>Cooking Q&amp;A (Seasoned Advice)</title>
+    <updated>2026-07-31T00:00:00Z</updated>
+    <summary>Stack Exchange Q&amp;A for professional and amateur cooking chefs</summary>
+    <language>eng</language>
+    <name>cooking.stackexchange.com_en_all</name>
+    <flavour></flavour>
+    <category>stack_exchange</category>
+    <tags>_category:stack_exchange;_details:no;stack_exchange;_videos:no;_ftindex:yes;_pictures:yes</tags>
+    <articleCount>59578</articleCount>
+    <mediaCount>7425</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/bc152b4c-e7f5-0cfb-aaf0-817ab430f243/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/cooking.stackexchange.com_en_all_2026-07" />
+    <author>
+      <name>Stack Exchange</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-07-31T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:bff12bdb-1fac-6ab0-ed6c-9f5f030722b3</id>
+    <title>iFixit in English</title>
+    <updated>2025-12-21T00:00:00Z</updated>
+    <summary>iFixit is a global community of people helping each other repair things. Let&apos;s …</summary>
+    <language>eng</language>
+    <name>ifixit_en_all</name>
+    <flavour></flavour>
+    <category>iFixit</category>
+    <tags>_category:iFixit;iFixit;_pictures:yes;_videos:yes;_ftindex:no;_details:yes</tags>
+    <articleCount>103480</articleCount>
+    <mediaCount>575002</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/bff12bdb-1fac-6ab0-ed6c-9f5f030722b3/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/ifixit_en_all_2025-12" />
+    <author>
+      <name>iFixit</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2025-12-21T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:c7f8f834-1232-80ba-186b-a6677e2e4225</id>
+    <title>Electronics Q&amp;A</title>
+    <updated>2026-08-01T00:00:00Z</updated>
+    <summary>Stack Exchange Q&amp;A for everything electronics and electrical engineering</summary>
+    <language>eng</language>
+    <name>electronics.stackexchange.com_en_all</name>
+    <flavour></flavour>
+    <category>stack_exchange</category>
+    <tags>_details:no;stack_exchange;_videos:no;_category:stack_exchange;_ftindex:yes;_pictures:yes</tags>
+    <articleCount>324255</articleCount>
+    <mediaCount>305578</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/c7f8f834-1232-80ba-186b-a6677e2e4225/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/electronics.stackexchange.com_en_all_2026-08" />
+    <author>
+      <name>Stack Exchange</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-08-01T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:d96d70af-e997-af90-1660-e22e462777f0</id>
+    <title>A Library of Knots</title>
+    <updated>2024-08-29T00:00:00Z</updated>
+    <summary>Illustrated resources on all types of knots, ladders, sutures, etc. </summary>
+    <language>eng</language>
+    <name>zimgit-knots_en</name>
+    <flavour></flavour>
+    <category></category>
+    <tags>preppers;_ftindex:no;_pictures:yes;_videos:yes;_details:yes</tags>
+    <articleCount>1</articleCount>
+    <mediaCount>369</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/d96d70af-e997-af90-1660-e22e462777f0/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/zimgit-knots_en_2024-08" />
+    <author>
+      <name>Various</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2024-08-29T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:ea76eed7-ac17-fa14-e60e-a4d767febef8</id>
+    <title>Gardening &amp; Landscaping Q&amp;A</title>
+    <updated>2026-08-01T00:00:00Z</updated>
+    <summary>Stack Exchange Q&amp;A for gardeners and landscapers</summary>
+    <language>eng</language>
+    <name>gardening.stackexchange.com_en_all</name>
+    <flavour></flavour>
+    <category>stack_exchange</category>
+    <tags>_category:stack_exchange;_videos:no;stack_exchange;_details:no;_ftindex:yes;_pictures:yes</tags>
+    <articleCount>32332</articleCount>
+    <mediaCount>23728</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/ea76eed7-ac17-fa14-e60e-a4d767febef8/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/gardening.stackexchange.com_en_all_2026-08" />
+    <author>
+      <name>Stack Exchange</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-08-01T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:f2c2fd4e-dba3-2b22-7318-3190feb051bc</id>
+    <title>Wiktionary</title>
+    <updated>2026-08-13T00:00:00Z</updated>
+    <summary>The largest dictionary on the web.</summary>
+    <language>eng</language>
+    <name>wiktionary_en_all</name>
+    <flavour>nopic</flavour>
+    <category>wiktionary</category>
+    <tags>wiktionary;_category:wiktionary;_pictures:no;_videos:no;_details:yes;_ftindex:yes</tags>
+    <articleCount>9129949</articleCount>
+    <mediaCount>15</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/f2c2fd4e-dba3-2b22-7318-3190feb051bc/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/wiktionary_en_all_nopic_2026-08" />
+    <author>
+      <name>Wiktionary</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-08-13T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:f9a43fc7-02be-d3de-7fce-9dc28f8b70c5</id>
+    <title>Post Disaster Resource Library</title>
+    <updated>2024-05-25T00:00:00Z</updated>
+    <summary>A collection of post-disaster resources.</summary>
+    <language>eng</language>
+    <name>zimgit-post-disaster_en</name>
+    <flavour></flavour>
+    <category></category>
+    <tags>preppers;_ftindex:no;_pictures:yes;_videos:yes;_details:yes</tags>
+    <articleCount>1</articleCount>
+    <mediaCount>369</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/f9a43fc7-02be-d3de-7fce-9dc28f8b70c5/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/zimgit-post-disaster_en_2024-05" />
+    <author>
+      <name>Zimgit</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2024-05-25T00:00:00Z</dc:issued>
+    
+  </entry>
+</feed>

@@ -1,0 +1,48 @@
+[project]
+name = "wiki-mcp"
+version = "0.1.0"
+description = "An MCP server that searches and reads an offline Kiwix library through kiwix-serve."
+readme = "README.md"
+authors = [
+    { name = "Alex Haslehurst", email = "alex.haslehurst@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "beautifulsoup4>=4.15.0",
+    "httpx>=0.28.1",
+    "lxml>=6.1.3",
+    "markdownify>=1.2.3",
+    # The 2.x line changes shape between minors; stay on the one this was built against.
+    "mcp>=2.1,<2.2",
+    "pypdf>=6.19.0",
+    "starlette>=0.48.0",
+    "uvicorn>=0.35.0",
+]
+
+[project.scripts]
+wiki-mcp = "wiki_mcp.__main__:main"
+
+[build-system]
+requires = ["uv_build>=0.11.21,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "ruff>=0.16.9",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+# `live` tests talk to a real kiwix-serve (KIWIX_URL); run them with `-m live`.
+markers = ["live: needs a running kiwix-serve at KIWIX_URL"]
+addopts = "-m 'not live'"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+# "a b c".split() is the readable way to write a word list.
+ignore = ["SIM905"]

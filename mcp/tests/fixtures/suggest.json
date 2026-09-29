@@ -1,0 +1,38 @@
+[
+  {
+    "value" : "Kettle",
+    "label" : "&lt;b&gt;Kettle&lt;/b&gt;",
+    "kind" : "path"
+      , "path" : "Device/Bouilloire"
+  },
+  {
+    "value" : "Kettle Schott Duran Tower T10021",
+    "label" : "&lt;b&gt;Kettle&lt;/b&gt; Schott Duran Tower T10021",
+    "kind" : "path"
+      , "path" : "Device/kettle_Schott_Duran_Tower_T10021"
+  },
+  {
+    "value" : "Tea Kettle",
+    "label" : "Tea &lt;b&gt;Kettle&lt;/b&gt;",
+    "kind" : "path"
+      , "path" : "Device/Tea_Kettle"
+  },
+  {
+    "value" : "Ovente Electric Kettle",
+    "label" : "Ovente Electric &lt;b&gt;Kettle&lt;/b&gt;",
+    "kind" : "path"
+      , "path" : "Device/Ovente_Electric_Kettle_KS88_Series"
+  },
+  {
+    "value" : "SMEG Tea Kettle",
+    "label" : "SMEG Tea &lt;b&gt;Kettle&lt;/b&gt;",
+    "kind" : "path"
+      , "path" : "Device/Smeg_Kettle"
+  },
+  {
+    "value" : "kettle ",
+    "label" : "containing &apos;kettle&apos;...",
+    "kind" : "pattern"
+    
+  }
+]

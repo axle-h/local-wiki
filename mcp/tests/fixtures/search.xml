@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+     xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/"
+     xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Search: bicycle chain skipping</title>
+    <link>/search?pattern=bicycle%20chain%20skipping&amp;&amp;format=xml&amp;start=0&amp;pageLength=3</link>
+    <description>Search result for bicycle chain skipping</description>
+    <opensearch:totalResults>600</opensearch:totalResults>
+    <opensearch:startIndex>0</opensearch:startIndex>
+    <opensearch:itemsPerPage>3</opensearch:itemsPerPage>
+    <atom:link rel="search" type="application/opensearchdescription+xml" href="/search/searchdescription.xml"/>
+    <opensearch:Query role="request"
+      searchTerms="bicycle chain skipping"
+      startIndex="0"
+      count="3"
+    />
+    <item>
+      <title>Highest Voted &apos;skip-tooth&apos; Questions</title>
+      <link>/content/bicycles.stackexchange.com_en_all_2026-08/questions/tagged/skip-tooth</link>
+        <description>...[<b>skip</b>-tooth] An old design of bicycle <b>chain</b> that was commonly used in the early 20th century. Unlike modern chains, where every link has a tooth, <b>skip</b> tooth chains have a tooth on every other link. A "<b>skip</b> tooth <b>chain</b>," also known as a "block <b>chain</b>," is an older design of bicycle <b>chain</b> that was commonly used in the early 20th century. Unlike modern chains, where every link has a tooth, <b>skip</b> tooth chains have a tooth on every other link. The larger teeth and wider spaces between them were thought......</description>
+        <book>
+          <title>Bicycles Q&amp;A</title>
+        </book>
+        <wordCount>277</wordCount>
+    </item>
+    <item>
+      <title>Bicycles/Maintenance and Repair/Chains/Checking chain wear</title>
+      <link>/content/wikibooks_en_all_maxi_2026-04/Bicycles/Maintenance_and_Repair/Chains/Checking_chain_wear</link>
+        <description>...<b>chain</b> wear &lt; Bicycles | Maintenance and Repair | Chains This <b>chain</b> is not worn out yet A worn out <b>chain</b> Chains increase in length over time due to wear on the pins and bushings. Continuing to use a <b>chain</b> that is beyond a reasonable length can not only cause the <b>chain</b> to "<b>skip</b>" when pedalling under pressure but will also wear out the rest of your drivetrain as the teeth on the cassette/freewheel and chainrings try to match the length of the <b>chain</b>. If you catch a <b>chain</b> before it is too worn you......</description>
+        <book>
+          <title>Wikibooks</title>
+        </book>
+        <wordCount>335</wordCount>
+    </item>
+    <item>
+      <title>Bicycle keeps &apos;skipping a beat&apos;</title>
+      <link>/content/bicycles.stackexchange.com_en_all_2026-08/questions/21454/bicycle-keeps-skipping-a-beat</link>
+        <description>...<b>chain</b> and a new cassette. – Scott Hillson May 05 '14 at 19:29 I've had this happen with worn chainset teeth too. – mjsqu May 05 '14 at 20:09 Does it only happen in certain gears? What does it sound like? – jimchristie May 06 '14 at 01:12 The <b>chain</b> and possibly some of the cogs are worn out. If you're not familiar with bike maintenance then take it to your local bike shop. – Daniel R Hicks May 06 '14 at 01:33 possible duplicate of What could be the reason for <b>chain</b> skipping – Rory......</description>
+        <book>
+          <title>Bicycles Q&amp;A</title>
+        </book>
+        <wordCount>581</wordCount>
+    </item>
+  </channel>
+</rss>

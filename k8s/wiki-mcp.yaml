@@ -1,0 +1,118 @@
+# wiki-mcp: the MCP server over the library (source in mcp/), bearer token required.
+#   LAN:    http://10.0.0.10:30090/mcp
+#   Public: https://wiki.ax-h.com/mcp  (only the exact /mcp path is routed; /healthz stays internal)
+# It reads everything through kiwix-serve's Service, so it needs no volume.
+#
+# The image is pinned to a commit tag, not :latest, so a node with no internet can still start
+# the image it already has. To deploy a new build, set the tag from the `mcp` workflow's summary.
+#
+# The token lives in a Secret created out of band, never in this file:
+#   kubectl -n wiki create secret generic wiki-mcp-token --from-literal=token="$(openssl rand -hex 32)"
+# Read it back with:
+#   kubectl -n wiki get secret wiki-mcp-token -o jsonpath='{.data.token}' | base64 -d
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wiki-mcp
+  namespace: wiki
+  labels:
+    app: wiki-mcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wiki-mcp
+  template:
+    metadata:
+      labels:
+        app: wiki-mcp
+    spec:
+      containers:
+        - name: wiki-mcp
+          image: ghcr.io/axle-h/local-wiki-mcp:COMMIT_SHA
+          env:
+            - name: KIWIX_URL
+              value: http://kiwix.wiki.svc.cluster.local
+            # Host-header allow-list (DNS-rebinding protection); loopback is always allowed
+            - name: MCP_ALLOWED_HOSTS
+              value: wiki.ax-h.com,10.0.0.10
+            - name: MCP_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: wiki-mcp-token
+                  key: token
+          ports:
+            - name: http
+              containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          securityContext:
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              # Headroom for extracting a large PDF book; idle it sits under 100Mi.
+              memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wiki-mcp
+  namespace: wiki
+  labels:
+    app: wiki-mcp
+spec:
+  type: NodePort
+  selector:
+    app: wiki-mcp
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+      nodePort: 30090
+---
+# Shares wiki.ax-h.com and its certificate with the kiwix Ingress, so no
+# cert-manager annotation here (a second Certificate for the same secret would fight).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wiki-mcp
+  namespace: wiki
+  labels:
+    app: wiki-mcp
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: wiki-redirect-http-https@kubernetescrd
+    # Traefik ranks routers by rule length, and kiwix's PathPrefix(`/`) rule is the longer one
+    traefik.ingress.kubernetes.io/router.priority: "100"
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: wiki.ax-h.com
+      http:
+        paths:
+          - path: /mcp
+            pathType: Exact
+            backend:
+              service:
+                name: wiki-mcp
+                port:
+                  name: http
+  tls:
+    - hosts:
+        - wiki.ax-h.com
+      secretName: wiki-axh-com-tls

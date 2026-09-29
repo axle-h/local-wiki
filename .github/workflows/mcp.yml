@@ -1,0 +1,129 @@
+# Tests wiki-mcp, builds its image, proves the image starts and guards /mcp, and on main pushes it
+# to ghcr.io for k8s/wiki-mcp.yaml to pull. Nothing is pushed that has not passed all of that.
+name: mcp
+
+on:
+  push:
+    branches: [main]
+    paths: ["mcp/**", ".github/workflows/mcp.yml"]
+  pull_request:
+    paths: ["mcp/**", ".github/workflows/mcp.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: mcp-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  # Lets GITHUB_TOKEN push to ghcr.io; making the package public is a one-off in its own settings.
+  packages: write
+
+# Must match the image k8s/wiki-mcp.yaml pulls.
+env:
+  IMAGE: ghcr.io/${{ github.repository }}-mcp
+
+defaults:
+  run:
+    working-directory: mcp
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      # --locked fails rather than resolving something new, so a pyproject change without its
+      # lockfile is caught here.
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Lint
+        run: uv run ruff check && uv run ruff format --check
+
+      - name: Test
+        run: uv run pytest
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build the image
+        uses: docker/build-push-action@v7
+        with:
+          context: mcp
+          push: false
+          load: true # into the runner's docker, so the smoke test can run it
+          tags: wiki-mcp:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Exactly how the Deployment runs it: non-root, no capabilities, read-only root filesystem.
+      - name: Start the container the way Kubernetes will
+        run: |
+          docker run -d --name wiki-mcp-ci --read-only --cap-drop ALL \
+            -e MCP_AUTH_TOKEN=ci-token -e KIWIX_URL=http://127.0.0.1:9 \
+            -p 8000:8000 wiki-mcp:ci
+
+      - name: It answers health checks, refuses strangers and lists its tools
+        timeout-minutes: 2
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:8000/healthz >/dev/null 2>&1; then break; fi
+            if [ "$i" = 30 ]; then echo "::error::/healthz never came up"; exit 1; fi
+            sleep 1
+          done
+
+          list='{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
+          headers=(-H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream'
+                   -H 'MCP-Protocol-Version: 2025-06-18')
+
+          status=$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8000/mcp "${headers[@]}" -d "$list")
+          if [ "$status" != 401 ]; then echo "::error::/mcp without a token answered $status, not 401"; exit 1; fi
+          echo "no token: 401"
+
+          tools=$(curl -fsS -X POST http://localhost:8000/mcp "${headers[@]}" \
+            -H 'Authorization: Bearer ci-token' -d "$list" | jq -r '[.result.tools[].name] | join(",")')
+          if [ "$tools" != "search,read" ]; then echo "::error::tools/list gave '$tools'"; exit 1; fi
+          echo "with the token: tools $tools"
+
+      # Main only: a fork's pull request gets a read-only token, so this login would always fail.
+      - name: Log in to ghcr.io
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          # Via the environment: `${{ }}` inside `run:` is pasted into the script before bash sees it.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "$GITHUB_TOKEN" | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
+
+      # Pushes the image that just ran rather than rebuilding it. The Deployment pins the commit
+      # tag, so a node with no internet can still start the image it already has.
+      - name: Push it
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          set -euo pipefail
+          docker tag wiki-mcp:ci "$IMAGE:latest"
+          docker tag wiki-mcp:ci "$IMAGE:$GITHUB_SHA"
+          docker push "$IMAGE:latest"
+          docker push "$IMAGE:$GITHUB_SHA"
+          {
+            echo "### Pushed \`$IMAGE:$GITHUB_SHA\`"
+            echo "Deploy it by setting that tag in \`k8s/wiki-mcp.yaml\`, then:"
+            echo '```shell'
+            echo "kubectl apply -f k8s/wiki-mcp.yaml"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Container logs
+        if: always()
+        run: docker logs wiki-mcp-ci 2>&1 | tail -50
+
+      - name: Stop it
+        if: always()
+        run: docker rm -f wiki-mcp-ci >/dev/null 2>&1 || true

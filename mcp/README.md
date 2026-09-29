@@ -1,0 +1,50 @@
+# wiki-mcp
+
+An MCP server that lets an agent search and read the offline library. It is built for small local models: there are two tools, and neither needs the model to know which source to look in.
+
+| Tool | Does |
+|---|---|
+| `search(query, limit=10)` | Searches the whole library at once and returns titles, sources, snippets and a `url` for each hit. |
+| `read(url, find=None, offset=0)` | Returns a page, article or PDF book as markdown, a part at a time. `find="tourniquet"` returns only the passages about that. |
+
+It sits in front of kiwix-serve and adds nothing to the library itself.
+
+## What `search` covers
+
+kiwix-serve's own search ranks results across every source that has a full-text index. Two kinds of source fall outside that, and `search` covers them itself:
+
+- **Title-only sources** have no full-text index; iFixit is one. They are searched through kiwix's per-source title suggestions and listed under *Matching titles*.
+- **PDF libraries** are the zimgit medical, water, food, post-disaster and knots collections. Each is a JavaScript page over a `database.js` that lists each PDF's title, description and author. kiwix indexes none of that, so wiki-mcp loads those lists and matches them itself, listed under *Books and manuals*.
+
+Map sources are skipped: they have no text to read.
+
+## What `read` returns
+
+- **MediaWiki pages** (Wikipedia, Wikibooks, Wiktionary, …): the article body, with navigation, edit links, reference lists and navboxes removed.
+- **Stack Exchange pages**: the question, then each answer with its score.
+- **PDFs**: the text with `[page N]` markers. Extracting a big book takes a few seconds the first time; the 16 most recently read documents are cached.
+- **Links and images are dropped.** `search` is how a model gets around, and links cost tokens.
+
+## Configuration
+
+| Env var | Default | |
+|---|---|---|
+| `KIWIX_URL` | `http://kiwix.wiki.svc.cluster.local` | kiwix-serve's base URL |
+| `MCP_AUTH_TOKEN` | required | The bearer token. `Authorization: <token>` without `Bearer` is accepted too. |
+| `MCP_INSECURE_NO_AUTH` | unset | `1` runs without a token; for local testing only |
+| `MCP_ALLOWED_HOSTS` | none (check off) | Comma-separated Host headers to accept; loopback is always allowed |
+| `PORT` | `8000` | |
+| `READ_PAGE_CHARS` | `8000` | How much text `read` returns per call |
+
+The transport is streamable HTTP at `/mcp`. It is stateless and answers in JSON, so a pod restart drops no sessions. `/healthz` needs no token and never calls kiwix.
+
+## Development
+
+```sh
+uv sync
+uv run pytest                 # unit tests, against recorded kiwix responses in tests/fixtures
+uv run ruff check && uv run ruff format --check
+KIWIX_URL=http://10.0.0.10:30088 MCP_AUTH_TOKEN=dev uv run wiki-mcp    # serves :8000
+```
+
+CI (`.github/workflows/mcp.yml`) runs the checks. It then builds the image, runs it the way Kubernetes does (read-only, no capabilities, non-root), and checks that `/mcp` refuses a missing token and lists the two tools. On `main` it pushes `ghcr.io/axle-h/local-wiki-mcp:<sha>` and `:latest`.

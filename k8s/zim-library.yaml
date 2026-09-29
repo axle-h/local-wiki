@@ -1,0 +1,104 @@
+# The offline library: which ZIMs to fetch, and the Job that fetches them.
+# To add/remove content, edit zims.txt, then re-run the sync:
+#   kubectl -n wiki delete job zim-sync --ignore-not-found && kubectl apply -f zim-library.yaml
+# The Job skips files already present, resumes partial downloads, verifies each
+# sha256, then registers the file in /data/library.xml, which kiwix-serve
+# watches, so new content appears without a restart.
+# Browse more: kiwix-catalog-en.tsv, or https://library.kiwix.org
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zim-library
+  namespace: wiki
+data:
+  zims.txt: |
+    # Core
+    https://download.kiwix.org/zim/wikibooks/wikibooks_en_all_maxi_2026-04.zim
+    https://download.kiwix.org/zim/wiktionary/wiktionary_en_all_nopic_2026-08.zim
+    https://download.kiwix.org/zim/ifixit/ifixit_en_all_2025-12.zim
+    https://download.kiwix.org/zim/zimit/nhs.uk_en_medicines_2026-09b.zim
+    https://download.kiwix.org/zim/maps/maps_en_united-kingdom_2026-06.zim
+
+    # Q&A
+    https://download.kiwix.org/zim/stack_exchange/diy.stackexchange.com_en_all_2026-08.zim
+    https://download.kiwix.org/zim/stack_exchange/gardening.stackexchange.com_en_all_2026-08.zim
+    https://download.kiwix.org/zim/stack_exchange/mechanics.stackexchange.com_en_all_2026-08.zim
+    https://download.kiwix.org/zim/stack_exchange/ham.stackexchange.com_en_all_2026-08.zim
+    https://download.kiwix.org/zim/stack_exchange/cooking.stackexchange.com_en_all_2026-07.zim
+    https://download.kiwix.org/zim/stack_exchange/outdoors.stackexchange.com_en_all_2026-08.zim
+    https://download.kiwix.org/zim/stack_exchange/electronics.stackexchange.com_en_all_2026-08.zim
+    https://download.kiwix.org/zim/stack_exchange/bicycles.stackexchange.com_en_all_2026-08.zim
+    https://download.kiwix.org/zim/stack_exchange/woodworking.stackexchange.com_en_all_2026-08.zim
+    https://download.kiwix.org/zim/stack_exchange/homebrew.stackexchange.com_en_all_2026-08.zim
+    https://download.kiwix.org/zim/stack_exchange/sustainability.stackexchange.com_en_all_2026-08.zim
+    https://download.kiwix.org/zim/stack_exchange/pets.stackexchange.com_en_all_2026-08.zim
+    https://download.kiwix.org/zim/stack_exchange/engineering.stackexchange.com_en_all_2026-08.zim
+
+    # Preparedness (from Kiwix's preppers bundle, minus the Canadian/US channels)
+    https://download.kiwix.org/zim/other/zimgit-water_en_2024-08.zim
+    https://download.kiwix.org/zim/other/zimgit-food-preparation_en_2025-04.zim
+    https://download.kiwix.org/zim/other/usda-2015_en_2025-04.zim
+    https://download.kiwix.org/zim/other/zimgit-post-disaster_en_2024-05.zim
+    https://download.kiwix.org/zim/zimit/cd3wdproject.org_en_all_2025-11.zim
+    https://download.kiwix.org/zim/zimit/irp.fas.org_en_military-medicine_2026-05.zim
+    https://download.kiwix.org/zim/other/zimgit-medicine_en_2024-08.zim
+    https://download.kiwix.org/zim/other/zimgit-knots_en_2024-08.zim
+    https://download.kiwix.org/zim/other/restarters_en_all_maxi_2026-04.zim
+    https://download.kiwix.org/zim/other/wikiciv_en_all_maxi_2025-11.zim
+
+    # Wikipedia last: the biggest download
+    https://download.kiwix.org/zim/wikipedia/wikipedia_en_all_maxi_2026-08.zim
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: zim-sync
+  namespace: wiki
+spec:
+  backoffLimit: 30
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: sync
+          image: ghcr.io/kiwix/kiwix-tools:3.8.2
+          securityContext:
+            runAsUser: 1001
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              cd /data
+              for URL in $(grep -v '^ *#' /config/zims.txt); do
+                F=$(basename "$URL")
+                # Another Job may still be writing this file: wait for it rather than race it
+                if [ -f "$F.part" ]; then
+                  a=$(stat -c %s "$F.part"); sleep 30; b=$(stat -c %s "$F.part" 2>/dev/null || echo gone)
+                  if [ "$a" != "$b" ]; then
+                    echo "$F is being downloaded elsewhere; waiting"
+                    until [ -f "$F" ]; do sleep 60; done
+                  fi
+                fi
+                if [ ! -f "$F" ]; then
+                  echo "downloading $F"
+                  wget -c -O "$F.part" "$URL"
+                  wget -qO- "$URL.sha256" | sed "s|  $F\$|  $F.part|" | sha256sum -c -
+                  mv "$F.part" "$F"
+                fi
+                kiwix-manage library.xml add "$F"
+                echo "ready: $F"
+              done
+              echo "library in sync"
+          volumeMounts:
+            - name: zim
+              mountPath: /data
+            - name: list
+              mountPath: /config
+      volumes:
+        - name: zim
+          persistentVolumeClaim:
+            claimName: zim
+        - name: list
+          configMap:
+            name: zim-library
