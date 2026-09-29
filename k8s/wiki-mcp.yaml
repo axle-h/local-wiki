@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: wiki-mcp
-          image: ghcr.io/axle-h/local-wiki-mcp:bc906304c2dbdc423e52a2f38b62fa182ad2757f
+          image: ghcr.io/axle-h/local-wiki-mcp:09b80362ea63b02234d8af0631e3d705343f1235
           env:
             - name: KIWIX_URL
               value: http://kiwix.wiki.svc.cluster.local
