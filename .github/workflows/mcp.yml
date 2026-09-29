@@ -91,7 +91,7 @@ jobs:
 
           tools=$(curl -fsS -X POST http://localhost:8000/mcp "${headers[@]}" \
             -H 'Authorization: Bearer ci-token' -d "$list" | jq -r '[.result.tools[].name] | join(",")')
-          if [ "$tools" != "search,read" ]; then echo "::error::tools/list gave '$tools'"; exit 1; fi
+          if [ "$tools" != "search_library,read_library" ]; then echo "::error::tools/list gave '$tools'"; exit 1; fi
           echo "with the token: tools $tools"
 
       # Main only: a fork's pull request gets a read-only token, so this login would always fail.
