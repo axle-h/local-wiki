@@ -119,7 +119,9 @@ def parse_search(xml: str) -> tuple[list[Hit], int]:
     channel = root.find("channel")
     if channel is None:
         return [], 0
-    total = int(channel.findtext("{http://a9.com/-/spec/opensearch/1.1/}totalResults") or 0)
+    # kiwix formats large totals for people: "40,000".
+    raw_total = channel.findtext("{http://a9.com/-/spec/opensearch/1.1/}totalResults") or ""
+    total = int(re.sub(r"\D", "", raw_total) or 0)
     hits = [
         Hit(
             title=(item.findtext("title") or "").strip(),
@@ -180,11 +182,18 @@ def query_terms(query: str) -> list[str]:
     return [w for w in words if len(w) > 2 and w not in _STOPWORDS] or words
 
 
+def _words(text: str) -> set[str]:
+    """Lower-cased words, each also under its singular, so "burns" meets "burn"."""
+    words = set(re.findall(r"[\w']+", text.lower()))
+    return words | {w[:-1] for w in words if len(w) > 3 and w.endswith("s")}
+
+
 def match_documents(docs: list[Document], query: str, limit: int) -> list[Hit]:
-    terms = query_terms(query)
+    """Whole-word matches only: "treat" must not find "Water Treatment"."""
+    terms = {t[:-1] if len(t) > 3 and t.endswith("s") else t for t in query_terms(query)}
     scored = []
     for doc in docs:
-        title, rest = doc.title.lower(), f"{doc.description} {doc.author}".lower()
+        title, rest = _words(doc.title), _words(f"{doc.description} {doc.author}")
         score = sum(2 * (t in title) + (t in rest) for t in terms)
         if score:
             scored.append((score, doc))

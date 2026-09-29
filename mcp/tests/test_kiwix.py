@@ -3,6 +3,7 @@ from conftest import NAUTILUS_BOOK, fixture
 
 from wiki_mcp.kiwix import (
     Book,
+    Document,
     KiwixClient,
     KiwixError,
     content_path,
@@ -101,3 +102,20 @@ async def test_a_pdf_is_known_by_its_catalog_title_however_its_url_is_escaped(
     ):
         doc = await kiwix.document_for(url)
         assert doc is not None and doc.title == "Emergency War Surgery"
+
+
+def test_a_total_formatted_with_thousands_separators_still_parses() -> None:
+    xml = fixture("search.xml").replace(
+        "<opensearch:totalResults>600<", "<opensearch:totalResults>40,000<"
+    )
+    hits, total = parse_search(xml)
+    assert total == 40_000 and len(hits) == 3
+
+
+def test_documents_match_whole_words_and_their_plurals_only() -> None:
+    def doc(title: str) -> Document:
+        return Document(book=MEDICAL, title=title, description="", author="", url=f"/x/{title}")
+
+    docs = [doc("Water Treatment"), doc("Burn Care")]
+    assert [h.title for h in match_documents(docs, "treat a burn", limit=5)] == ["Burn Care"]
+    assert [h.title for h in match_documents(docs, "burns", limit=5)] == ["Burn Care"]

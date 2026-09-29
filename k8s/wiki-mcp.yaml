@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: wiki-mcp
-          image: ghcr.io/axle-h/local-wiki-mcp:10246d5730bcb1d4512f86e37858dbb26f78be04
+          image: ghcr.io/axle-h/local-wiki-mcp:4463c306392407895c914b4c065b274547ecdbbf
           env:
             - name: KIWIX_URL
               value: http://kiwix.wiki.svc.cluster.local
@@ -55,6 +55,12 @@ spec:
               port: http
             initialDelaySeconds: 10
             periodSeconds: 30
+          # Lets Traefik drop this pod from its endpoints before it stops, so a rollout
+          # doesn't answer 502 in the gap.
+          lifecycle:
+            preStop:
+              sleep:
+                seconds: 5
           securityContext:
             runAsNonRoot: true
             readOnlyRootFilesystem: true
