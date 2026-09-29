@@ -12,6 +12,8 @@ from wiki_mcp.kiwix import (
     parse_nautilus,
     parse_search,
     parse_suggest,
+    title_candidates,
+    title_matches,
 )
 
 MEDICAL = Book(id=NAUTILUS_BOOK, title="Medical Library", fulltext=False)
@@ -119,3 +121,53 @@ def test_documents_match_whole_words_and_their_plurals_only() -> None:
     docs = [doc("Water Treatment"), doc("Burn Care")]
     assert [h.title for h in match_documents(docs, "treat a burn", limit=5)] == ["Burn Care"]
     assert [h.title for h in match_documents(docs, "burns", limit=5)] == ["Burn Care"]
+
+
+@pytest.mark.parametrize(
+    ("query", "expected"),
+    [
+        ("treat a burn", ["Treat burn", "Treat", "Burn"]),
+        ("car battery not charging", ["Car battery charging", "Car battery", "Battery charging"]),
+        ("hypothermia symptoms", ["Hypothermia symptoms", "Hypothermia", "Symptoms"]),
+        ("nosebleed", ["Nosebleed"]),
+    ],
+)
+def test_title_candidates_try_phrases_then_single_words_for_short_queries(
+    query: str, expected: list[str]
+) -> None:
+    assert title_candidates(query) == expected
+
+
+async def test_the_wikipedia_article_named_by_the_query_comes_first(kiwix: KiwixClient) -> None:
+    results = await kiwix.search("treat a burn", 10)
+    first = results.reference_hits[0]
+    assert (first.title, first.source) == ("Burn", "Wikipedia")
+    assert first.snippet.startswith("A burn is an injury")
+    # "Treat" is a disambiguation page, so it is left out.
+    assert all(h.title != "Treat" for h in results.reference_hits)
+    # "First aid" came back from the per-book search, but its title shares no keyword.
+    assert [h.title for h in results.reference_hits] == ["Burn"]
+
+
+async def test_a_generic_title_match_must_mention_the_other_keywords(kiwix: KiwixClient) -> None:
+    titles = [h.title for h in (await kiwix.search("hypothermia symptoms", 10)).reference_hits]
+    assert "Hypothermia" in titles
+    assert "Symptom" not in titles  # the Symptom article never mentions hypothermia
+
+
+async def test_reference_hits_are_not_repeated_in_the_general_list(kiwix: KiwixClient) -> None:
+    results = await kiwix.search("treat a burn", 10)
+    references = {h.url for h in results.reference_hits}
+    assert not references & {h.url for h in results.text_hits}
+
+
+@pytest.mark.parametrize(
+    ("title", "matched"),
+    [
+        ("First Aid/Burns", 1),
+        ("Self-Reliance Handbook/Purifying Water", 2),
+        ("Muggles' Guide to Harry Potter/Magic/Blood Blisterpod", 0),
+    ],
+)
+def test_title_matches_counts_keywords_allowing_endings(title: str, matched: int) -> None:
+    assert title_matches(title, ["burn", "purify", "water"]) == matched

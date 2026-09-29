@@ -45,11 +45,19 @@ def test_exactly_two_tools(rpc: Callable[..., Any]) -> None:
     assert read["inputSchema"]["required"] == ["url"]
 
 
+def test_search_puts_reference_articles_first(rpc: Callable[..., Any]) -> None:
+    text = tool_text(
+        rpc("tools/call", {"name": "search_library", "arguments": {"query": "treat a burn"}})
+    )
+    assert text.index("## Encyclopedia and handbook") < text.index("## Everything else")
+    assert "1. **Burn** — Wikipedia" in text
+
+
 def test_search_lists_articles_books_and_titles(rpc: Callable[..., Any]) -> None:
     text = tool_text(
         rpc("tools/call", {"name": "search_library", "arguments": {"query": "kettle wound"}})
     )
-    assert "## Articles (3 of 600 matches)" in text
+    assert "## Everything else (600 matches in all)" in text
     assert "url: /content/wikibooks_en_all_maxi_2026-04/Bicycles/" in text
     assert "## Books and manuals" in text and "Wound Closure Manual" in text
     assert "## Matching titles" in text and "**Kettle** — iFixit" in text

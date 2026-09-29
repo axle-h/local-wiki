@@ -13,7 +13,18 @@ The tool descriptions do most of the work of getting a model to use the tools at
 
 ## What `search_library` covers
 
-kiwix-serve's own search ranks results across every source that has a full-text index. Two kinds of source fall outside that, and `search_library` covers them itself:
+Results come in up to four sections.
+
+**Encyclopedia and handbook** comes first. kiwix's ranking across all sources tends to bury the obvious article under loosely related Q&A threads: "treat a burn" ranks threads about treated wood above Wikipedia's *Burn*. So Wikipedia and Wikibooks are searched on their own as well, and two signals are combined, strongest first:
+
+1. **Exact titles.** A Wikipedia article whose title is a multi-word part of the query (*Car battery*, which redirects to *Automotive battery*).
+2. **Per-source search.** Wikipedia and Wikibooks hits whose title contains every keyword.
+3. **Exact titles again.** A Wikipedia article whose title is a single keyword (*Burn*). Only for one- or two-keyword queries, and only if the article also mentions the other keyword, so "hypothermia symptoms" doesn't surface *Symptom*.
+4. **Per-source search again.** Hits whose title contains some keyword.
+
+Disambiguation pages are skipped, and per-source hits whose title shares no keyword are dropped.
+
+**Everything else** is kiwix's own full-text search across every source that has a full-text index. Two kinds of source fall outside it, and `search_library` covers them itself:
 
 - **Title-only sources** have no full-text index; iFixit is one. They are searched through kiwix's per-source title suggestions and listed under *Matching titles*.
 - **PDF libraries** are the zimgit medical, water, food, post-disaster and knots collections. Each is a JavaScript page over a `database.js` that lists each PDF's title, description and author. kiwix indexes none of that, so wiki-mcp loads those lists and matches them itself, listed under *Books and manuals*.

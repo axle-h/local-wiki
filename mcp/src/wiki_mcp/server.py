@@ -161,9 +161,12 @@ def build_server(config: Config, kiwix: KiwixClient) -> MCPServer:
 
         lines = [f'# Results for "{query}"']
         n = 1
+        if results.reference_hits:
+            lines += _format_hits("Encyclopedia and handbook", results.reference_hits, n)
+            n += len(results.reference_hits)
         if results.text_hits:
             lines += _format_hits(
-                f"Articles ({len(results.text_hits)} of {results.text_total} matches)",
+                f"Everything else ({results.text_total:,} matches in all)",
                 results.text_hits,
                 n,
             )

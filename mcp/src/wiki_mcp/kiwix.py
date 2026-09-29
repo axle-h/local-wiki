@@ -8,6 +8,12 @@ full-text index. Two kinds of book fall outside that, and this module covers the
 - "Nautilus" libraries (the zimgit PDF collections): a JavaScript page over a
   `database.js` that lists each PDF's title, description and author. kiwix indexes
   none of it, so the list is loaded here and matched against the query directly.
+
+kiwix's cross-book ranking also buries the obvious encyclopedia article under
+loosely related Q&A threads ("treat a burn" ranks threads about treated wood above
+Wikipedia's *Burn*). Reference articles are therefore found separately: a search
+restricted to each reference book, where kiwix ranks far better, plus a Wikipedia
+title lookup in the manner of its "Go" button.
 """
 
 import ast
@@ -31,9 +37,15 @@ _CATALOG_TTL_SECONDS = 300.0
 _SKIP_TITLE_SEARCH_PREFIXES = ("maps_",)
 _MAX_CONTENT_BYTES = 150 * 1024 * 1024
 _STOPWORDS = frozenset(
-    "a an and are as at be by can do for from how i in is it my of on or the to what "
-    "when where which who why with without you your".split()
+    "a an and are as at be by can could did do does for from get how i in is it my not "
+    "of on or should the to what when where which who why with without would you your".split()
 )
+#: Books whose articles are the "obvious answer" kind, searched on their own as well.
+_REFERENCE_PREFIXES = ("wikipedia_", "wikibooks_")
+_REFERENCE_HITS_PER_BOOK = 3
+_MAX_TITLE_LOOKUPS = 4
+#: Wikipedia's disambiguation and set-index message boxes.
+_DISAMBIGUATION = re.compile(r"\bdmbox\b|\bsetindexbox\b")
 
 
 @dataclass(frozen=True)
@@ -65,6 +77,8 @@ class Hit:
 
 @dataclass
 class SearchResults:
+    #: Encyclopedia and handbook articles: title matches first, then per-book search.
+    reference_hits: list[Hit] = field(default_factory=list)
     text_hits: list[Hit] = field(default_factory=list)
     text_total: int = 0
     title_hits: list[Hit] = field(default_factory=list)
@@ -209,6 +223,41 @@ def match_documents(docs: list[Document], query: str, limit: int) -> list[Hit]:
     ]
 
 
+def title_candidates(query: str) -> list[str]:
+    """Titles worth trying as exact Wikipedia articles, most specific first.
+
+    The keyword phrase and each adjacent pair ("car battery"); single words only for a
+    one- or two-word query, where a word alone is likely to be the subject ("burn").
+    """
+    terms = query_terms(query)
+    phrases = [" ".join(terms)]
+    phrases += [f"{a} {b}" for a, b in zip(terms, terms[1:], strict=False)]
+    if len(terms) <= 2:
+        phrases += terms
+    seen: list[str] = []
+    for phrase in phrases:
+        title = phrase[:1].upper() + phrase[1:]
+        if title and title not in seen:
+            seen.append(title)
+    return seen[:_MAX_TITLE_LOOKUPS]
+
+
+def title_matches(title: str, terms: list[str]) -> int:
+    """How many query terms a title contains, allowing endings: "burn" meets "Burns",
+    "purify" meets "Purifying"."""
+    words = re.findall(r"[\w']+", title.lower())
+    return sum(1 for t in terms if any(w.startswith(t[:5]) for w in words))
+
+
+def _lead(page: str) -> str:
+    """The first substantial paragraph of an article, as plain text."""
+    for para in re.findall(r"<p[ >].*?</p>", page, flags=re.S):
+        text = _clean_snippet(para)
+        if len(text) > 80:
+            return text
+    return ""
+
+
 def content_path(url: str) -> str:
     """Normalise whatever the caller passed (a full URL, or a path) to `/content/...`."""
     path = urlsplit(url.strip()).path if "://" in url else url.strip().split("?", 1)[0]
@@ -263,14 +312,90 @@ class KiwixClient:
             self._nautilus[book.id] = parse_nautilus(r.text, book) if r.is_success else []
         return self._nautilus[book.id]
 
-    async def _fulltext(self, query: str, limit: int) -> tuple[list[Hit], int]:
-        r = await self._http.get(
-            "/search", params={"pattern": query, "format": "xml", "pageLength": str(limit)}
-        )
+    async def _fulltext(
+        self, query: str, limit: int, book: Book | None = None
+    ) -> tuple[list[Hit], int]:
+        params = {"pattern": query, "format": "xml", "pageLength": str(limit)}
+        if book is not None:
+            params["content"] = book.id
+        r = await self._http.get("/search", params=params)
         if r.status_code == 404:  # kiwix's answer to "nothing matched"
             return [], 0
         r.raise_for_status()
         return parse_search(r.text)
+
+    async def _article(self, book: Book, title: str, other_terms: list[str]) -> Hit | None:
+        """The article titled exactly `title` (after redirects), if it is a real article
+        that also mentions the query's other keywords; a generic hit such as *Symptom*
+        for "hypothermia symptoms" fails that test."""
+        r = await self._http.get(f"/content/{book.id}/{quote(title.replace(' ', '_'))}")
+        if not r.is_success or "html" not in r.headers.get("content-type", ""):
+            return None
+        page = r.text
+        if _DISAMBIGUATION.search(page):
+            return None
+        lowered = page.lower()
+        if any(term[:5] not in lowered for term in other_terms):
+            return None
+        found = re.search(r"<title>(.*?)</title>", page, flags=re.S)
+        return Hit(
+            title=html.unescape(found.group(1)).strip() if found else title,
+            source=book.title,
+            url=quote(r.url.path, safe="/"),  # httpx hands back the path unescaped
+            snippet=_lead(page),
+        )
+
+    async def _reference(self, books: list[Book], query: str) -> list[Hit]:
+        """Encyclopedia and handbook articles for the query, strongest first.
+
+        1. Wikipedia articles titled by a multi-word part of the query ("Car battery").
+        2. Per-book search hits whose title contains every keyword.
+        3. Wikipedia articles titled by a single keyword ("Burn").
+        4. Per-book search hits whose title contains some keyword.
+        Per-book hits whose title shares no keyword are dropped: kiwix still ranks
+        them, but they are rarely the article someone wants, and they stay in the
+        general results.
+        """
+        references = [b for b in books if b.fulltext and b.id.startswith(_REFERENCE_PREFIXES)]
+        wikipedia = next((b for b in references if b.id.startswith("wikipedia_")), None)
+        terms = query_terms(query)
+        candidates = title_candidates(query) if wikipedia is not None else []
+        found = await asyncio.gather(
+            *(
+                self._article(
+                    wikipedia,  # type: ignore[arg-type]  # candidates is empty without it
+                    title,
+                    [t for t in terms if t not in set(title.lower().split())],
+                )
+                for title in candidates
+            ),
+            *(self._fulltext(query, _REFERENCE_HITS_PER_BOOK, b) for b in references),
+            return_exceptions=True,
+        )
+        for result in found:
+            if isinstance(result, BaseException):
+                logger.warning("reference lookup failed: %s", result)
+
+        titled = list(zip(candidates, found[: len(candidates)], strict=True))
+        phrase_titles = [h for c, h in titled if isinstance(h, Hit) and " " in c]
+        word_titles = [h for c, h in titled if isinstance(h, Hit) and " " not in c]
+        searched = [
+            hit
+            for result in found[len(candidates) :]
+            if isinstance(result, tuple)
+            for hit in result[0]
+        ]
+        by_match = [(title_matches(h.title, terms), h) for h in searched]
+        full = [h for n, h in by_match if n == len(terms)]
+        partial = [h for n, h in by_match if 0 < n < len(terms)]
+
+        seen: set[str] = set()
+        ordered = []
+        for hit in [*phrase_titles, *full, *word_titles, *partial]:
+            if unquote(hit.url) not in seen:
+                seen.add(unquote(hit.url))
+                ordered.append(hit)
+        return ordered
 
     async def _titles(self, book: Book, query: str, limit: int) -> list[Hit]:
         r = await self._http.get(
@@ -288,22 +413,29 @@ class KiwixClient:
         documents = [d for docs in docs_per_book for d in docs]
         suggest_books = [b for b, docs in zip(title_only, docs_per_book, strict=True) if not docs]
 
-        fulltext, *titles = await asyncio.gather(
+        reference, fulltext, *titles = await asyncio.gather(
+            self._reference(books, query),
             self._fulltext(query, limit),
             *(self._titles(b, query, 3) for b in suggest_books),
             return_exceptions=True,
         )
+        if isinstance(reference, BaseException):
+            logger.warning("reference search failed: %s", reference)
+        else:
+            results.reference_hits = reference
         if isinstance(fulltext, BaseException):
             logger.warning("full-text search failed: %s", fulltext)
             results.errors.append(f"full-text search failed: {fulltext}")
         else:
             results.text_hits, results.text_total = fulltext
+            listed_refs = {unquote(h.url) for h in results.reference_hits}
+            results.text_hits = [h for h in results.text_hits if unquote(h.url) not in listed_refs]
         for book, found in zip(suggest_books, titles, strict=True):
             if isinstance(found, BaseException):
                 logger.warning("title search in %s failed: %s", book.id, found)
             else:
                 results.title_hits.extend(found)
-        listed = {h.url for h in results.text_hits}
+        listed = {h.url for h in results.text_hits} | {h.url for h in results.reference_hits}
         results.title_hits = [h for h in results.title_hits if h.url not in listed][:limit]
         results.document_hits = match_documents(documents, query, min(limit, 5))
         return results

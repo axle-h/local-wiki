@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">
+  <channel>
+    <title>Search: test</title>
+    <opensearch:totalResults>1</opensearch:totalResults>
+    <item>
+      <title>First aid</title>
+      <link>/content/wikipedia_en_all_maxi_2026-08/First_aid</link>
+        <description>...<b>First</b> aid is the first and immediate assistance given to any person with a medical emergency...</description>
+        <book><title>Wikipedia</title></book>
+        <wordCount>9000</wordCount>
+    </item>
+  </channel>
+</rss>
