@@ -1,12 +1,13 @@
 # local-wiki
 
-An offline reference library, curated to be useful through a long outage (6+ months): English Wikipedia plus practical repair, medical, food, water and self-reliance content. It runs on the k3s node `nas`, in the `wiki` namespace.
+An offline reference library, curated to be useful through a long outage (6+ months): English Wikipedia plus practical repair, medical, food, water and self-reliance content. It runs on k3s, in the `wiki` namespace.
 
 | What | Where |
 |---|---|
-| Web UI (LAN) | http://10.0.0.10:30088 |
-| Web UI (public) | https://wiki.ax-h.com |
-| MCP server for agents | https://wiki.ax-h.com/mcp (public) or http://10.0.0.10:30090/mcp (LAN); bearer token either way |
+| Web UI | `http://<node-ip>:30088` on the LAN, or `https://<your-host>` through the Ingress |
+| MCP server for agents | `http://<node-ip>:30090/mcp` on the LAN, or `https://<your-host>/mcp`; bearer token either way |
+
+In this README, `<node-ip>` is the address of your k3s node and `<your-host>` is the public hostname you give the Ingress (see [Configuring for your cluster](#configuring-for-your-cluster)).
 
 Everything is served from [Kiwix](https://kiwix.org) ZIM files: pre-rendered, compressed archives of websites with a built-in search index.
 
@@ -23,6 +24,17 @@ k8s/wiki-mcp.yaml       the MCP server for agents: Deployment, NodePort + Ingres
 mcp/                    wiki-mcp's source (Python); see mcp/README.md
 kiwix-catalog-en.tsv    snapshot of the English Kiwix catalogue (2026-09-29), for choosing content
 ```
+
+## Configuring for your cluster
+
+The manifests assume a single-node k3s cluster with Traefik and cert-manager. Before the first deploy, change these to match yours:
+
+- **Hostname**: the `host` and `tls.hosts` of both Ingresses (`k8s/kiwix.yaml` and `k8s/wiki-mcp.yaml`), plus the TLS `secretName` if you want it named after your host.
+- **`MCP_ALLOWED_HOSTS`** in `k8s/wiki-mcp.yaml`: your hostname and node IP.
+- **Certificate issuer**: the `cert-manager.io/cluster-issuer` annotation on the kiwix Ingress, which expects a ClusterIssuer called `letsencrypt-production`.
+- **Image**: `k8s/wiki-mcp.yaml` pulls `ghcr.io/<owner>/local-wiki-mcp:<sha>`, where `<owner>` is the GitHub account CI runs under.
+
+If you only want LAN access, you can delete both Ingresses and use the NodePorts.
 
 Deploy or update everything with:
 
@@ -83,14 +95,14 @@ Kiwix publishes new builds every few months. The date is in the filename, so upd
 Each source has its own search bar: it suggests titles as you type, and Enter runs a full-text search. The box on the home page only filters the *list of sources*; it doesn't search their contents. To search everything at once, use:
 
 ```
-https://wiki.ax-h.com/search?pattern=your+words
+https://<your-host>/search?pattern=your+words
 ```
 
 Some sources have no full-text index, so only title search works for them: iFixit, the UK map, the zimgit libraries, and a few other small ones.
 
 ### MCP (agents)
 
-[wiki-mcp](mcp/README.md) is our own small MCP server, built for local models. It serves streamable HTTP at https://wiki.ax-h.com/mcp, and on the LAN at http://10.0.0.10:30090/mcp. It has two tools:
+[wiki-mcp](mcp/README.md) is our own small MCP server, built for local models. It serves streamable HTTP at `https://<your-host>/mcp`, and on the LAN at `http://<node-ip>:30090/mcp`. It has two tools:
 
 - `search_library(query)` covers the whole library in one call. That includes the PDF books in the zimgit libraries and the title-only sources such as iFixit, which kiwix's own search can't see.
 - `read_library(url, find=…, offset=…)` returns a hit as markdown. `find` jumps to the passages about a topic, which is the way to use long PDF books.
@@ -108,37 +120,37 @@ To rotate the token, delete the Secret, recreate it, and run `kubectl -n wiki ro
 **Claude Code:**
 
 ```sh
-claude mcp add --transport http --scope user wiki https://wiki.ax-h.com/mcp \
+claude mcp add --transport http --scope user wiki https://<your-host>/mcp \
   --header "Authorization: Bearer $(kubectl -n wiki get secret wiki-mcp-token -o jsonpath='{.data.token}' | base64 -d)"
 ```
 
-**LM Studio** (`mcp.json`; use `https://wiki.ax-h.com/mcp` away from home):
+**LM Studio** (`mcp.json`; use `https://<your-host>/mcp` away from the LAN):
 
 ```json
-{ "mcpServers": { "wiki": { "url": "http://10.0.0.10:30090/mcp",
+{ "mcpServers": { "wiki": { "url": "http://<node-ip>:30090/mcp",
     "headers": { "Authorization": "Bearer <token>" } } } }
 ```
 
-**Deploying a new build**: pushing to `main` under `mcp/` runs the `mcp` workflow. It tests, builds and smoke-tests the image, then pushes `ghcr.io/axle-h/local-wiki-mcp:<sha>`. Put that tag in `k8s/wiki-mcp.yaml` and `kubectl apply` it. The Deployment pins a commit tag rather than `:latest` on purpose: `:latest` makes Kubernetes pull from ghcr on every pod start, which fails without internet, while a pinned tag starts from the copy already on the node.
+**Deploying a new build**: pushing to `main` under `mcp/` runs the `mcp` workflow. It tests, builds and smoke-tests the image, then pushes `ghcr.io/<owner>/local-wiki-mcp:<sha>`. Put that tag in `k8s/wiki-mcp.yaml` and `kubectl apply` it. The Deployment pins a commit tag rather than `:latest` on purpose: `:latest` makes Kubernetes pull from ghcr on every pod start, which fails without internet, while a pinned tag starts from the copy already on the node.
 
 ## Networking
 
-- **LAN**: NodePorts 30088 (web) and 30090 (MCP) on 10.0.0.10.
-- **Public**: `wiki.ax-h.com` serves the web UI, and `wiki.ax-h.com/mcp` serves MCP. The MCP route is a second Ingress with Traefik `router.priority: 100`: Traefik ranks routes by rule length, so without it kiwix's `PathPrefix(/)` rule would win. It reuses the kiwix Ingress's certificate and has no cert-manager annotation of its own. Both follow the same pattern as the other apps on the cluster:
-  - Traefik Ingress
+- **LAN**: NodePorts 30088 (web) and 30090 (MCP) on the node.
+- **Public**: `<your-host>` serves the web UI, and `<your-host>/mcp` serves MCP. The MCP route is a second Ingress with Traefik `router.priority: 100`: Traefik ranks routes by rule length, so without it kiwix's `PathPrefix(/)` rule would win. It reuses the kiwix Ingress's certificate and has no cert-manager annotation of its own. Both use:
+  - a Traefik Ingress
   - cert-manager with `letsencrypt-production`; the certificate renews automatically
-  - the namespace's `redirect-http-https` middleware
+  - the namespace's `redirect-http-https` middleware, defined in `k8s/kiwix.yaml`
 
-  DNS is kept current by the hourly `ddns` CronJob, whose `DOMAINS` list includes `wiki.ax-h.com`.
+  Point your hostname's DNS at the node yourself; nothing here manages it.
 
-Kiwix search is the most CPU-hungry part, and the node has 4 cores. If crawlers become a problem, put the ingress behind SSO or add a Traefik rate-limit middleware.
+Kiwix search is the most CPU-hungry part, so a public instance on a small node is easy to overload. If crawlers become a problem, put the ingress behind SSO or add a Traefik rate-limit middleware.
 
 ## Resilience notes
 
-- If the grid is down, so is the NAS. Keep a second copy of the `.zim` files on a laptop or USB drive; the Kiwix desktop and Android apps read them directly, with no server needed.
+- If the grid is down, so is the server. Keep a second copy of the `.zim` files on a laptop or USB drive; the Kiwix desktop and Android apps read them directly, with no server needed.
 - Install on your phones: Kiwix (Android), Trail Sense, Survival Manual.
 
 ## Housekeeping
 
-- The PVC requests 200Gi. local-path doesn't enforce that size, and the node has about 880 GB free.
+- The PVC requests 200Gi. local-path doesn't enforce that size, so check the node has room for the content list (about 158 GB today) plus updates.
 - A finished `zim-sync` Job deletes itself after a day (`ttlSecondsAfterFinished`), so re-running the sync is just `kubectl apply`.
