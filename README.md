@@ -140,10 +140,5 @@ Kiwix search is the most CPU-hungry part, and the node has 4 cores. If crawlers 
 
 ## Housekeeping
 
-- The original Wikipedia download ran as a one-off Job, `zim-download`, driven by a ConfigMap `zim`. Neither is in these manifests any more. Once `wikipedia_en_all_maxi_2026-08.zim` exists and `zim-sync` has finished, delete them:
-
-  ```sh
-  kubectl -n wiki delete job zim-download cm zim
-  ```
-
 - The PVC requests 200Gi. local-path doesn't enforce that size, and the node has about 880 GB free.
+- A finished `zim-sync` Job deletes itself after a day (`ttlSecondsAfterFinished`), so re-running the sync is just `kubectl apply`.

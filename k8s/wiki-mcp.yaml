@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: wiki-mcp
-          image: ghcr.io/axle-h/local-wiki-mcp:COMMIT_SHA
+          image: ghcr.io/axle-h/local-wiki-mcp:10246d5730bcb1d4512f86e37858dbb26f78be04
           env:
             - name: KIWIX_URL
               value: http://kiwix.wiki.svc.cluster.local
