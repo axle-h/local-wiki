@@ -17,7 +17,7 @@ class Config:
     #: Host headers the MCP endpoint answers for (DNS-rebinding protection); empty turns it off.
     allowed_hosts: tuple[str, ...] = ()
     port: int = 8000
-    #: How much of a document `read` returns per call.
+    #: How much of a document `read_library` returns per call.
     page_chars: int = 8000
 
     @classmethod

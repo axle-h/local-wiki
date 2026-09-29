@@ -92,8 +92,8 @@ Some sources have no full-text index, so only title search works for them: iFixi
 
 [wiki-mcp](mcp/README.md) is our own small MCP server, built for local models. It serves streamable HTTP at https://wiki.ax-h.com/mcp, and on the LAN at http://10.0.0.10:30090/mcp. It has two tools:
 
-- `search(query)` covers the whole library in one call. That includes the PDF books in the zimgit libraries and the title-only sources such as iFixit, which kiwix's own search can't see.
-- `read(url, find=…, offset=…)` returns a hit as markdown. `find` jumps to the passages about a topic, which is the way to use long PDF books.
+- `search_library(query)` covers the whole library in one call. That includes the PDF books in the zimgit libraries and the title-only sources such as iFixit, which kiwix's own search can't see.
+- `read_library(url, find=…, offset=…)` returns a hit as markdown. `find` jumps to the passages about a topic, which is the way to use long PDF books.
 
 Every request to `/mcp` needs the bearer token; without it the server answers 401. Only the exact `/mcp` path is routed publicly, so the unauthenticated `/healthz` stays internal. `MCP_ALLOWED_HOSTS` pins the accepted Host headers, for DNS-rebinding protection.
 

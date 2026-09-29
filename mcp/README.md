@@ -4,26 +4,28 @@ An MCP server that lets an agent search and read the offline library. It is buil
 
 | Tool | Does |
 |---|---|
-| `search(query, limit=10)` | Searches the whole library at once and returns titles, sources, snippets and a `url` for each hit. |
-| `read(url, find=None, offset=0)` | Returns a page, article or PDF book as markdown, a part at a time. `find="tourniquet"` returns only the passages about that. |
+| `search_library(query, limit=10)` | Searches the whole library at once and returns titles, sources, snippets and a `url` for each hit. |
+| `read_library(url, find=None, offset=0)` | Returns a page, article or PDF book as markdown, a part at a time. `find="tourniquet"` returns only the passages about that. |
 
 It sits in front of kiwix-serve and adds nothing to the library itself.
 
-## What `search` covers
+The tool descriptions do most of the work of getting a model to use the tools at all. Many clients, LM Studio among them, never show the model the server's `instructions`, so each description says on its own what the library holds and when to reach for it. That list lives in `LIBRARY` in `src/wiki_mcp/server.py`; keep it in step with `k8s/zim-library.yaml`.
 
-kiwix-serve's own search ranks results across every source that has a full-text index. Two kinds of source fall outside that, and `search` covers them itself:
+## What `search_library` covers
+
+kiwix-serve's own search ranks results across every source that has a full-text index. Two kinds of source fall outside that, and `search_library` covers them itself:
 
 - **Title-only sources** have no full-text index; iFixit is one. They are searched through kiwix's per-source title suggestions and listed under *Matching titles*.
 - **PDF libraries** are the zimgit medical, water, food, post-disaster and knots collections. Each is a JavaScript page over a `database.js` that lists each PDF's title, description and author. kiwix indexes none of that, so wiki-mcp loads those lists and matches them itself, listed under *Books and manuals*.
 
 Map sources are skipped: they have no text to read.
 
-## What `read` returns
+## What `read_library` returns
 
 - **MediaWiki pages** (Wikipedia, Wikibooks, Wiktionary, …): the article body, with navigation, edit links, reference lists and navboxes removed.
 - **Stack Exchange pages**: the question, then each answer with its score.
 - **PDFs**: the text with `[page N]` markers. Extracting a big book takes a few seconds the first time; the 16 most recently read documents are cached.
-- **Links and images are dropped.** `search` is how a model gets around, and links cost tokens.
+- **Links and images are dropped.** `search_library` is how a model gets around, and links cost tokens.
 
 ## Configuration
 
@@ -34,7 +36,7 @@ Map sources are skipped: they have no text to read.
 | `MCP_INSECURE_NO_AUTH` | unset | `1` runs without a token; for local testing only |
 | `MCP_ALLOWED_HOSTS` | none (check off) | Comma-separated Host headers to accept; loopback is always allowed |
 | `PORT` | `8000` | |
-| `READ_PAGE_CHARS` | `8000` | How much text `read` returns per call |
+| `READ_PAGE_CHARS` | `8000` | How much text `read_library` returns per call |
 
 The transport is streamable HTTP at `/mcp`. It is stateless and answers in JSON, so a pod restart drops no sessions. `/healthz` needs no token and never calls kiwix.
 

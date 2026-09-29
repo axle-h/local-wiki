@@ -207,7 +207,7 @@ def content_path(url: str) -> str:
         path = "/" + path
     if not path.startswith("/content/") or ".." in unquote(path).split("/"):
         raise KiwixError(
-            f"Not a library URL: {url!r}. Use a `url` exactly as the search tool returned it "
+            f"Not a library URL: {url!r}. Use a `url` exactly as search_library returned it "
             "(it starts with /content/)."
         )
     return path

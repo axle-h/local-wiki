@@ -40,13 +40,15 @@ def test_an_unlisted_host_is_refused_even_with_the_token(client: TestClient) -> 
 
 def test_exactly_two_tools(rpc: Callable[..., Any]) -> None:
     tools = rpc("tools/list")["tools"]
-    assert [t["name"] for t in tools] == ["search", "read"]
-    read = next(t for t in tools if t["name"] == "read")
+    assert [t["name"] for t in tools] == ["search_library", "read_library"]
+    read = next(t for t in tools if t["name"] == "read_library")
     assert read["inputSchema"]["required"] == ["url"]
 
 
 def test_search_lists_articles_books_and_titles(rpc: Callable[..., Any]) -> None:
-    text = tool_text(rpc("tools/call", {"name": "search", "arguments": {"query": "kettle wound"}}))
+    text = tool_text(
+        rpc("tools/call", {"name": "search_library", "arguments": {"query": "kettle wound"}})
+    )
     assert "## Articles (3 of 600 matches)" in text
     assert "url: /content/wikibooks_en_all_maxi_2026-04/Bicycles/" in text
     assert "## Books and manuals" in text and "Wound Closure Manual" in text
@@ -55,7 +57,7 @@ def test_search_lists_articles_books_and_titles(rpc: Callable[..., Any]) -> None
 
 def test_read_returns_the_article_text(rpc: Callable[..., Any]) -> None:
     url = "/content/bicycles.stackexchange.com_en_all_2026-08/questions/21454/x"
-    text = tool_text(rpc("tools/call", {"name": "read", "arguments": {"url": url}}))
+    text = tool_text(rpc("tools/call", {"name": "read_library", "arguments": {"url": url}}))
     assert text.startswith("# Bicycle keeps 'skipping a beat'\nSource: Bicycles Q&A")
     assert "## Answer (score 3)" in text
 
@@ -63,14 +65,27 @@ def test_read_returns_the_article_text(rpc: Callable[..., Any]) -> None:
 def test_read_pages_long_documents_and_says_how_to_continue(rpc: Callable[..., Any]) -> None:
     # The Stack Exchange fixture is about 3k characters of text; a small page forces paging.
     url = "/content/bicycles.stackexchange.com_en_all_2026-08/questions/21454/x"
-    first = tool_text(rpc("tools/call", {"name": "read", "arguments": {"url": url}}))
+    first = tool_text(rpc("tools/call", {"name": "read_library", "arguments": {"url": url}}))
     assert "To continue" not in first  # fits in the default page
     found = tool_text(
-        rpc("tools/call", {"name": "read", "arguments": {"url": url, "find": "chain"}})
+        rpc("tools/call", {"name": "read_library", "arguments": {"url": url, "find": "chain"}})
     )
     assert 'Passages about "chain"' in found and "## Passage 1 (offset" in found
 
 
 def test_read_explains_a_bad_url_instead_of_failing(rpc: Callable[..., Any]) -> None:
-    text = tool_text(rpc("tools/call", {"name": "read", "arguments": {"url": "/search?x"}}))
+    text = tool_text(rpc("tools/call", {"name": "read_library", "arguments": {"url": "/search?x"}}))
     assert "Not a library URL" in text
+
+
+def test_tools_say_what_the_library_holds_and_describe_every_parameter(
+    rpc: Callable[..., Any],
+) -> None:
+    # Clients such as LM Studio never show the model the server instructions, so the
+    # tool descriptions alone must tell it when to reach for the library.
+    tools = {t["name"]: t for t in rpc("tools/list")["tools"]}
+    assert "Wikipedia" in tools["search_library"]["description"]
+    assert "first aid" in tools["search_library"]["description"]
+    for tool in tools.values():
+        for name, schema in tool["inputSchema"]["properties"].items():
+            assert schema.get("description"), f"{tool['name']}.{name} has no description"

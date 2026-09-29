@@ -1,16 +1,22 @@
-"""The MCP surface: two tools, `search` and `read`, shaped for small local models.
+"""The MCP surface: two tools, `search_library` and `read_library`, shaped for small local models.
 
-Neither tool needs the model to know which book to look in. `search` covers the
-whole library in one call, and `read` takes a URL exactly as `search` returned it.
+Neither tool needs the model to know which book to look in. `search_library` covers
+the whole library in one call, and `read_library` takes a URL exactly as it was returned.
+
+The descriptions carry the weight of getting a model to use the tools at all. Many
+clients (LM Studio among them) never show the model the server's `instructions`, so
+each tool description says on its own what the library holds and when to reach for it.
 """
 
 import asyncio
 import logging
 from collections import OrderedDict
+from typing import Annotated
 from urllib.parse import unquote
 
 from mcp.server import MCPServer
 from mcp.types import ToolAnnotations
+from pydantic import Field
 
 from wiki_mcp import __version__
 from wiki_mcp.config import Config
@@ -19,15 +25,45 @@ from wiki_mcp.kiwix import Content, Hit, KiwixClient, KiwixError, content_path
 
 logger = logging.getLogger(__name__)
 
-INSTRUCTIONS = """\
-An offline reference library: Wikipedia, Wikibooks, Wiktionary, iFixit repair guides, \
-practical Q&A (DIY, gardening, cooking, electronics, mechanics, first aid and more), \
-medical and survival manuals, and PDF books.
+#: What the library holds, in the words a model will match a question against.
+#: Keep in step with k8s/zim-library.yaml when content is added or removed.
+LIBRARY = """\
+The library holds all of English Wikipedia, plus Wikibooks (textbooks and how-to \
+guides), Wiktionary (a dictionary), iFixit repair guides, the NHS medicines A-Z, \
+Q&A sites on home improvement and DIY, electronics, car mechanics, bicycles, cooking, \
+gardening, the outdoors, amateur radio, woodworking, pets and engineering, and PDF \
+manuals on first aid, emergency and field medicine, water treatment, food \
+preservation and post-disaster survival.\
+"""
 
-1. Call `search` with a few keywords.
-2. Call `read` with the `url` of the most promising result.
-3. For long documents (PDF books especially), pass `find` to `read` to jump to the \
-passages about your topic instead of paging from the start.\
+INSTRUCTIONS = f"""\
+An offline reference library that works without internet. {LIBRARY}
+
+Look things up here before answering from memory: call `search_library` with a few \
+keywords, then `read_library` with the url of the best result. For long documents \
+(PDF books especially), pass `find` to `read_library` to jump to the passages you need.\
+"""
+
+SEARCH_DESCRIPTION = f"""\
+Search a large offline reference library and get a ranked list of matching articles, \
+Q&A threads and books, each with a url to read.
+
+{LIBRARY}
+
+Use this whenever answering needs facts, explanations, instructions or advice: health \
+and first aid, repairs and DIY, how something works, science, history, people, places, \
+cooking, gardening, the meaning of a word. Prefer it to answering from memory; it is \
+reliable reference material and it works without internet.
+
+Then call read_library with the url of the most promising result to get its full text.\
+"""
+
+READ_DESCRIPTION = """\
+Get the full text of an article, Q&A thread or book found with search_library.
+
+Long documents come back in parts; the end of each part gives the offset to continue \
+from. For long documents, especially PDF books, pass `find` with a word or phrase to \
+get only the passages about it instead of reading from the start.\
 """
 
 _READ_ONLY = ToolAnnotations(readOnlyHint=True, openWorldHint=False)
@@ -70,7 +106,7 @@ def _page_from(content: Content) -> Page:
         return extract_pdf(content.body)
     if content.content_type in ("text/html", "application/xhtml+xml"):
         page = extract_html(content.body)
-        # Most pages open with their own title as a heading, which `read`'s header already
+        # Most pages open with their own title as a heading, which `read_library`'s header already
         # gives. Dropped here, before caching, so `find` offsets and paging share one text.
         if page.title:
             page = Page(page.title, page.text.removeprefix(f"# {page.title}").lstrip())
@@ -100,13 +136,22 @@ def build_server(config: Config, kiwix: KiwixClient) -> MCPServer:
             cache.put(path, page)
         return page
 
-    @mcp.tool(title="Search the library", annotations=_READ_ONLY, structured_output=False)
-    async def search(query: str, limit: int = 10) -> str:
-        """Search everything in the offline library at once and list the best matches.
-
-        Use a few keywords, e.g. "purify water boiling" or "bike chain skipping".
-        Each result has a `url`; pass it to `read` to get the full text.
-        """
+    @mcp.tool(
+        title="Search the offline library",
+        description=SEARCH_DESCRIPTION,
+        annotations=_READ_ONLY,
+        structured_output=False,
+    )
+    async def search_library(
+        query: Annotated[
+            str,
+            Field(
+                description="A few keywords, not a whole sentence, "
+                'e.g. "treat a burn", "purify water boiling" or "bike chain skipping".'
+            ),
+        ],
+        limit: Annotated[int, Field(description="How many results to return, 1 to 25.")] = 10,
+    ) -> str:
         limit = max(1, min(limit, _MAX_LIMIT))
         try:
             results = await kiwix.search(query, limit)
@@ -133,15 +178,32 @@ def build_server(config: Config, kiwix: KiwixClient) -> MCPServer:
         lines += [f"Note: {err}" for err in results.errors]
         return "\n".join(lines)
 
-    @mcp.tool(title="Read a library page", annotations=_READ_ONLY, structured_output=False)
-    async def read(url: str, find: str | None = None, offset: int = 0) -> str:
-        """Read a page, article or book from the library as text.
-
-        `url` is a url exactly as `search` returned it. Long documents come back in
-        parts: to continue, call again with the `offset` given at the end.
-        `find` (optional) returns only the passages about a topic, e.g. find="tourniquet".
-        Use it for long documents such as PDF books.
-        """
+    @mcp.tool(
+        title="Read from the offline library",
+        description=READ_DESCRIPTION,
+        annotations=_READ_ONLY,
+        structured_output=False,
+    )
+    async def read_library(
+        url: Annotated[
+            str,
+            Field(description="A url exactly as search_library returned it (starts /content/)."),
+        ],
+        find: Annotated[
+            str | None,
+            Field(
+                description='Optional word or phrase, e.g. "tourniquet". Returns only the '
+                "passages that mention it; best for long documents and PDF books."
+            ),
+        ] = None,
+        offset: Annotated[
+            int,
+            Field(
+                description="Optional. Where to continue a long document, as given at the "
+                "end of the previous part or next to a passage."
+            ),
+        ] = 0,
+    ) -> str:
         try:
             path = content_path(url)
             page = await load(path)
@@ -174,7 +236,7 @@ def build_server(config: Config, kiwix: KiwixClient) -> MCPServer:
             lines = [*header, f'Passages about "{find}" ({len(text):,} characters in total):']
             for n, p in enumerate(passages, start=1):
                 lines += [f"\n## Passage {n} (offset {p.offset})", p.text]
-            lines.append("\nTo read on from a passage, call read with its offset.")
+            lines.append("\nTo read on from a passage, call read_library with its offset.")
             return "\n".join(lines)
 
         offset = max(0, min(offset, len(text)))
@@ -187,7 +249,7 @@ def build_server(config: Config, kiwix: KiwixClient) -> MCPServer:
         if end < len(text):
             lines.append(
                 f"[Characters {offset:,}–{end:,} of {len(text):,}. "
-                f"To continue, call read with offset={end}.]"
+                f"To continue, call read_library with offset={end}.]"
             )
         elif offset:
             lines.append(f"[End of document. Characters {offset:,}–{end:,}.]")
